@@ -1,122 +1,188 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { FormEvent, useState } from "react";
+
+import "./App.css";
+import Signup from "./Signup";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [loginMessage, setLoginMessage] = useState("");
+
+  if (window.location.pathname === "/signup") {
+    return <Signup />;
+  }
+
+  const validateForm = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Reset messages
+    setEmailError("");
+    setPasswordError("");
+    setLoginMessage("");
+
+    let isValid = true;
+
+    // Email validation
+    if (email.trim() === "") {
+      setEmailError("Email is required.");
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError("Please enter a valid email address.");
+      isValid = false;
+    }
+
+    // Password validation
+    if (password.trim() === "") {
+      setPasswordError("Password is required.");
+      isValid = false;
+    } else if (password.length < 8) {
+      setPasswordError("Password must be at least 8 characters.");
+      isValid = false;
+    }
+
+    if (!isValid) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    setTimeout(() => {
+      setIsLoading(false);
+      setLoginMessage("Login information is valid!");
+    }, 1000);
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
+    <main className="login-page">
+      <section className="login-card">
+        <div className="login-header">
+          <div className="logo">
+            CS
+          </div>
+
+          <h1>Welcome Back</h1>
+
           <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
+            Log in to your CollabSpace account
           </p>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+        <form onSubmit={validateForm} noValidate>
+          {/* Email */}
+          <div className="form-group">
+            <label htmlFor="email">
+              Email Address
+            </label>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+            <input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setEmailError("");
+              }}
+              className={emailError ? "input-error" : ""}
+            />
+
+            {emailError && (
+              <span className="error-message">
+                {emailError}
+              </span>
+            )}
+          </div>
+
+          {/* Password */}
+          <div className="form-group">
+            <label htmlFor="password">
+              Password
+            </label>
+
+            <div className="password-input-wrapper">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError("");
+                }}
+                className={passwordError ? "input-error" : ""}
+              />
+
+              <button
+                type="button"
+                className="show-password-button"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+
+            {passwordError && (
+              <span className="error-message">
+                {passwordError}
+              </span>
+            )}
+          </div>
+
+          {/* Remember me and Forgot password */}
+          <div className="login-options">
+            <label className="remember-me">
+              <input type="checkbox" />
+              <span>Remember me</span>
+            </label>
+
+            <button
+              type="button"
+              className="forgot-password"
+            >
+              Forgot password?
+            </button>
+          </div>
+
+          {/* Login button */}
+          <button
+            type="submit"
+            className="login-button"
+            disabled={isLoading}
+          >
+            {isLoading ? "Logging in..." : "Log in"}
+          </button>
+
+          {/* Success message */}
+          {loginMessage && (
+            <div className="success-message">
+              {loginMessage}
+            </div>
+          )}
+        </form>
+
+        {/* Sign up */}
+        <div className="signup-section">
+          <span>
+            Don't have an account?
+          </span>
+
+          <button
+            type="button"
+            className="signup-button"
+            onClick={() => {
+              window.location.href = "/signup";
+            }}
+          >
+            Sign up
+          </button>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
       </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    </main>
+  );
 }
 
-export default App
+export default App;
