@@ -9,31 +9,31 @@ interface Activity {
 const activities: Activity[] = [
   {
     user: "Kian",
-    action: "updated",
-    target: "Dashboard",
+    action: "completed a task in",
+    target: "CollabSpace",
     time: "10 minutes ago",
-    icon: "✎",
+    icon: "✓",
+  },
+  {
+    user: "Dan",
+    action: "started working on",
+    target: "Projects",
+    time: "32 minutes ago",
+    icon: "→",
   },
   {
     user: "Con",
     action: "created a task in",
     target: "CollabSpace",
-    time: "32 minutes ago",
+    time: "1 hour ago",
     icon: "＋",
   },
   {
-    user: "Dan",
-    action: "completed a task in",
-    target: "Projects",
-    time: "1 hour ago",
-    icon: "✓",
-  },
-  {
     user: "Kian",
-    action: "joined",
-    target: "CollabSpace",
+    action: "updated",
+    target: "Portfolio Website",
     time: "2 hours ago",
-    icon: "→",
+    icon: "✎",
   },
 ];
 

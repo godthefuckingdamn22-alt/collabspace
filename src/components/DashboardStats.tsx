@@ -1,6 +1,7 @@
 import {
   FolderKanban,
   ListChecks,
+  CheckCircle2,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -20,10 +21,16 @@ const stats: StatCard[] = [
     icon: FolderKanban,
   },
   {
-    label: "Tasks",
-    value: "24",
-    description: "8 tasks completed",
+    label: "Active Tasks",
+    value: "16",
+    description: "8 due this week",
     icon: ListChecks,
+  },
+  {
+    label: "Completed",
+    value: "8",
+    description: "3 completed this week",
+    icon: CheckCircle2,
   },
   {
     label: "Team Members",
@@ -35,7 +42,7 @@ const stats: StatCard[] = [
 
 function DashboardStats() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => {
         const Icon = stat.icon;
 

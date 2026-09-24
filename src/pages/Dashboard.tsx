@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import DashboardStats from "../components/DashboardStats";
 import RecentProjects from "../components/RecentProjects";
 import RecentActivity from "../components/RecentActivity";
@@ -42,9 +43,13 @@ function Dashboard() {
             </p>
           </div>
 
-          <button className="text-sm font-medium text-indigo-600 transition hover:text-indigo-700">
-            View all
-          </button>
+            <Link
+              to="/projects"
+              className="text-sm font-medium text-indigo-600 transition hover:text-indigo-700"
+            >
+              View all
+            </Link>
+            
         </div>
 
         <RecentProjects />
