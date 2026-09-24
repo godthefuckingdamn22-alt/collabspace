@@ -2,6 +2,8 @@ interface Project {
   name: string;
   description: string;
   progress: number;
+  completedTasks: number;
+  totalTasks: number;
   members: number;
   status: "In Progress" | "Completed";
 }
@@ -11,6 +13,8 @@ const projects: Project[] = [
     name: "CollabSpace",
     description: "Collaborative workspace for teams.",
     progress: 72,
+    completedTasks: 13,
+    totalTasks: 18,
     members: 3,
     status: "In Progress",
   },
@@ -18,6 +22,8 @@ const projects: Project[] = [
     name: "Smart Pipeline",
     description: "IoT-based water monitoring project.",
     progress: 100,
+    completedTasks: 12,
+    totalTasks: 12,
     members: 4,
     status: "Completed",
   },
@@ -25,6 +31,8 @@ const projects: Project[] = [
     name: "Portfolio Website",
     description: "Personal developer portfolio.",
     progress: 58,
+    completedTasks: 7,
+    totalTasks: 12,
     members: 2,
     status: "In Progress",
   },
@@ -79,9 +87,13 @@ function RecentProjects() {
             </div>
           </div>
 
-          <div className="mt-5 border-t border-slate-100 pt-4">
+          <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
             <p className="text-sm text-slate-500">
               {project.members} team members
+            </p>
+
+            <p className="text-sm font-medium text-slate-600">
+              {project.completedTasks}/{project.totalTasks} tasks
             </p>
           </div>
         </div>
