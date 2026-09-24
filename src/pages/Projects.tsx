@@ -1,23 +1,10 @@
 import { useMemo, useState } from "react";
-
-type Member = {
-  id: string;
-  name: string;
-  initials: string;
-};
-
-type ProjectColor = "indigo" | "blue" | "green" | "red";
-
-type Project = {
-  id: string;
-  name: string;
-  description: string;
-  color: ProjectColor;
-  owner: string;
-  due: string;
-  progress: number;
-  members: Member[];
-};
+import { Link } from "react-router-dom";
+import {
+  currentUser,
+  useProjects,
+  type ProjectColor,
+} from "../context/ProjectContext";
 
 const colorClasses: Record<ProjectColor, string> = {
   indigo: "bg-indigo-500",
@@ -29,7 +16,13 @@ const colorClasses: Record<ProjectColor, string> = {
 function Projects() {
   const [showForm, setShowForm] = useState(false);
 
-  const [projectList, setProjectList] = useState<Project[]>([]);
+  const {
+    projects: projectList,
+    createProject,
+    addMember,
+    removeMember,
+    getProjectProgress,
+  } = useProjects();
 
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectDescription, setNewProjectDescription] = useState("");
@@ -45,21 +38,11 @@ function Projects() {
   const handleCreateProject = () => {
     if (!newProjectName.trim()) return;
 
-   const newProject: Project = {
-  id: crypto.randomUUID(),
-  name: newProjectName.trim(),
-  description: newProjectDescription.trim(),
-  color: newProjectColor,
-  owner: "You",
-  due: "TBD",
-  progress: 0,
-  members: [],
-};
-
-    setProjectList((currentProjects) => [
-      ...currentProjects,
-      newProject,
-    ]);
+    createProject(
+      newProjectName,
+      newProjectDescription,
+      newProjectColor
+    );
 
     setNewProjectName("");
     setNewProjectDescription("");
@@ -73,27 +56,7 @@ function Projects() {
 
     if (!memberName) return;
 
-    const member: Member = {
-      id: crypto.randomUUID(),
-      name: memberName,
-      initials: memberName
-        .split(/\s+/)
-        .map((part) => part[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase(),
-    };
-
-    setProjectList((currentProjects) =>
-      currentProjects.map((project) =>
-        project.id === projectId
-          ? {
-              ...project,
-              members: [...project.members, member],
-            }
-          : project
-      )
-    );
+    addMember(projectId, memberName);
 
     setNewMember((currentMembers) => ({
       ...currentMembers,
@@ -103,27 +66,21 @@ function Projects() {
 
   // Remove member from a project
   const handleRemoveMember = (
-      projectId: string,
-      memberId: string
-    ) => {
-      
-    setProjectList((currentProjects) =>
-      currentProjects.map((project) =>
-        project.id === projectId
-          ? {
-              ...project,
-              members: project.members.filter(
-                (member) => member.id !== memberId
-              ),
-            }
-          : project
-      )
-    );
+    projectId: string,
+    memberId: string
+  ) => {
+    removeMember(projectId, memberId);
   };
 
   // Search projects
   const filteredProjects = useMemo(() => {
     return projectList.filter((project) => {
+      const hasAccess = project.members.some(
+        (member) => member.id === currentUser.id
+      );
+
+      if (!hasAccess) return false;
+
       const search = searchTerm.toLowerCase();
 
       return (
@@ -281,153 +238,169 @@ function Projects() {
 
       {/* Projects List */}
       <div className="grid gap-4 md:grid-cols-2">
-        {filteredProjects.map((project) => (
-          <div
-            key={project.id}
-            className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-          >
+        {filteredProjects.map((project) => {
+          const progress = getProjectProgress(project);
 
-            {/* Color Accent */}
+          return (
             <div
-              className={`h-2 ${colorClasses[project.color]}`}
-            />
+              key={project.id}
+              className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+            >
 
-            {/* Card Content */}
-            <div className="p-5">
+              {/* Color Accent */}
+              <div
+                className={`h-2 ${colorClasses[project.color]}`}
+              />
 
-              {/* Project Header */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
+              {/* Card Content */}
+              <div className="p-5">
 
-                    <span
-                      className={`h-3 w-3 rounded-full ${
-                        colorClasses[project.color]
-                      }`}
-                    />
+                {/* Project Header */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
 
-                    <h3 className="font-semibold text-slate-900">
-                      {project.name}
-                    </h3>
+                      <span
+                        className={`h-3 w-3 rounded-full ${
+                          colorClasses[project.color]
+                        }`}
+                      />
+
+                      <h3 className="font-semibold text-slate-900">
+                        {project.name}
+                      </h3>
+                    </div>
+
+                    <p className="mt-1 text-sm text-slate-500">
+                      {project.description}
+                    </p>
                   </div>
 
-                  <p className="mt-1 text-sm text-slate-500">
-                    {project.description}
-                  </p>
-                </div>
-
-                <div className="text-right">
-                  <p className="text-sm font-medium text-slate-700">
-                    {project.owner}
-                  </p>
-
-                  <p className="text-sm text-slate-500">
-                    {project.due}
-                  </p>
-                </div>
-              </div>
-{/* Progress */}
-<div className="mt-5">
-  <div className="mb-2 flex items-center justify-between">
-    <span className="text-xs font-medium text-slate-500">
-      Progress
-    </span>
-
-    <span className="text-xs font-semibold text-slate-700">
-      {project.progress}%
-    </span>
-  </div>
-
-  <div className="h-2 overflow-hidden rounded-full bg-slate-200">
-    <div
-      className={`h-full rounded-full ${
-        colorClasses[project.color]
-      }`}
-      style={{
-        width: `${project.progress}%`,
-      }}
-    />
-  </div>
-</div>
-              {/* Members */}
-              <div className="mt-5 border-t border-slate-100 pt-4">
-                <p className="mb-3 text-sm font-medium text-slate-700">
-                  Members
-                </p>
-
-                {/* Add Member */}
-                <div className="mb-3 flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Enter member name..."
-                    value={newMember[project.id] || ""}
-                    onChange={(e) =>
-                      setNewMember((currentMembers) => ({
-                        ...currentMembers,
-                        [project.id]: e.target.value,
-                      }))
-                    }
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleAddMember(project.id);
-                      }
-                    }}
-                    className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      handleAddMember(project.id)
-                    }
-                    className="rounded-md bg-slate-800 px-3 py-2 text-sm text-white hover:bg-slate-700"
-                  >
-                    Add
-                  </button>
-                </div>
-
-                {/* Member List */}
-                <div className="flex flex-wrap gap-2">
-                  {project.members.length === 0 ? (
-                    <p className="text-xs text-slate-400">
-                      No members yet.
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-slate-700">
+                      {currentUser.name}
                     </p>
-                  ) : (
-                    project.members.map((member) => (
-                      <div
-                        key={member.id}
-                        className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5"
-                      >
-                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700">
-                          {member.initials}
-                        </span>
 
-                        <span className="text-sm text-slate-700">
-                          {member.name}
-                        </span>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleRemoveMember(
-                              project.id,
-                              member.id
-                            )
-                          }
-                          className="text-slate-400 hover:text-red-500"
-                          aria-label={`Remove ${member.name}`}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))
-                  )}
+                    <p className="text-sm text-slate-500">
+                      {project.due}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
+                {/* Progress */}
+                <div className="mt-5">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-xs font-medium text-slate-500">
+                      Progress
+                    </span>
+
+                    <span className="text-xs font-semibold text-slate-700">
+                      {progress}%
+                    </span>
+                  </div>
+
+                  <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+                    <div
+                      className={`h-full rounded-full ${
+                        colorClasses[project.color]
+                      }`}
+                      style={{
+                        width: `${progress}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Members */}
+                <div className="mt-5 border-t border-slate-100 pt-4">
+                  <p className="mb-3 text-sm font-medium text-slate-700">
+                    Members
+                  </p>
+
+                  {/* Add Member */}
+                  <div className="mb-3 flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Enter member name..."
+                      value={newMember[project.id] || ""}
+                      onChange={(e) =>
+                        setNewMember((currentMembers) => ({
+                          ...currentMembers,
+                          [project.id]: e.target.value,
+                        }))
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleAddMember(project.id);
+                        }
+                      }}
+                      className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleAddMember(project.id)
+                      }
+                      className="rounded-md bg-slate-800 px-3 py-2 text-sm text-white hover:bg-slate-700"
+                    >
+                      Add
+                    </button>
+                    
+                      <div className="mt-5 border-t border-slate-100 pt-4">
+                        <Link
+                          to={`/projects/${project.id}`}
+                          className="block w-full rounded-md bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-indigo-700"
+                        >
+                          View Project
+                        </Link>
+                      </div>
+
+                  </div>
+
+                  {/* Member List */}
+                  <div className="flex flex-wrap gap-2">
+                    {project.members.length === 0 ? (
+                      <p className="text-xs text-slate-400">
+                        No members yet.
+                      </p>
+                    ) : (
+                      project.members.map((member) => (
+                        <div
+                          key={member.id}
+                          className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5"
+                        >
+                          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700">
+                            {member.initials}
+                          </span>
+
+                          <span className="text-sm text-slate-700">
+                            {member.name}
+                          </span>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleRemoveMember(
+                                project.id,
+                                member.id
+                              )
+                            }
+                            className="text-slate-400 hover:text-red-500"
+                            aria-label={`Remove ${member.name}`}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Empty State */}
