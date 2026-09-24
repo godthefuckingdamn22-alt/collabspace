@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
 type Member = {
-  id: number;
+  id: string;
   name: string;
   initials: string;
 };
@@ -9,7 +9,7 @@ type Member = {
 type ProjectColor = "indigo" | "blue" | "green" | "red";
 
 type Project = {
-  id: number;
+  id: string;
   name: string;
   description: string;
   color: ProjectColor;
@@ -18,6 +18,7 @@ type Project = {
   progress: number;
   members: Member[];
 };
+
 const colorClasses: Record<ProjectColor, string> = {
   indigo: "bg-indigo-500",
   blue: "bg-blue-500",
@@ -38,14 +39,14 @@ function Projects() {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Stores the member currently being typed for each project
-  const [newMember, setNewMember] = useState<Record<number, string>>({});
+  const [newMember, setNewMember] = useState<Record<string, string>>({});
 
   // Create project
   const handleCreateProject = () => {
     if (!newProjectName.trim()) return;
 
    const newProject: Project = {
-  id: Date.now(),
+  id: crypto.randomUUID(),
   name: newProjectName.trim(),
   description: newProjectDescription.trim(),
   color: newProjectColor,
@@ -67,13 +68,13 @@ function Projects() {
   };
 
   // Add member to a project
-  const handleAddMember = (projectId: number) => {
+  const handleAddMember = (projectId: string) => {
     const memberName = newMember[projectId]?.trim();
 
     if (!memberName) return;
 
     const member: Member = {
-      id: Date.now(),
+      id: crypto.randomUUID(),
       name: memberName,
       initials: memberName
         .split(/\s+/)
@@ -102,9 +103,10 @@ function Projects() {
 
   // Remove member from a project
   const handleRemoveMember = (
-    projectId: number,
-    memberId: number
-  ) => {
+      projectId: string,
+      memberId: string
+    ) => {
+      
     setProjectList((currentProjects) =>
       currentProjects.map((project) =>
         project.id === projectId
