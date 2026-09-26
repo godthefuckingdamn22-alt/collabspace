@@ -132,7 +132,7 @@ function Projects() {
   }, [projectList, searchTerm]);
 
   return (
-    <div className="min-h-full bg-slate-50 p-6">
+    <div className="min-h-full bg-slate-50 px-4 py-5 sm:p-6">
 
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
