@@ -272,10 +272,19 @@ function Projects() {
         </div>
       )}
 
-      {/* Project Count */}
-      <p className="mb-3 text-sm text-slate-500">
-        {filteredProjects.length} project(s)
-      </p>
+     {/* Project Count */}
+<div className="mb-4 flex items-center justify-between">
+  <p className="text-sm font-medium text-slate-700">
+    {filteredProjects.length}{" "}
+    {filteredProjects.length === 1 ? "project" : "projects"}
+  </p>
+
+  {searchTerm && (
+    <p className="text-xs text-slate-400">
+      Searching for "{searchTerm}"
+    </p>
+  )}
+</div>
 
       {/* Projects List */}
       <div className="grid gap-4 md:grid-cols-2">
