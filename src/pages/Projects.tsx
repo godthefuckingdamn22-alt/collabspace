@@ -208,7 +208,7 @@ function Projects() {
                 <button
                   type="button"
                   onClick={() => setNewProjectColor("indigo")}
-                  className={`h-8 w-8 rounded-full bg-indigo-500 ring-2 ring-offset-2 ${
+                 className={`h-9 w-9 rounded-full bg-indigo-500 ring-2 ring-offset-2 transition ${
                     newProjectColor === "indigo"
                       ? "ring-indigo-500"
                       : "ring-transparent"
@@ -219,7 +219,7 @@ function Projects() {
                 <button
                   type="button"
                   onClick={() => setNewProjectColor("blue")}
-                  className={`h-8 w-8 rounded-full bg-blue-500 ring-2 ring-offset-2 ${
+                 className={`h-9 w-9 rounded-full bg-blue-500 ring-2 ring-offset-2 transition ${
                     newProjectColor === "blue"
                       ? "ring-blue-500"
                       : "ring-transparent"
@@ -230,7 +230,7 @@ function Projects() {
                 <button
                   type="button"
                   onClick={() => setNewProjectColor("green")}
-                  className={`h-8 w-8 rounded-full bg-green-500 ring-2 ring-offset-2 ${
+                  className={`h-9 w-9 rounded-full bg-green-500 ring-2 ring-offset-2 transition ${
                     newProjectColor === "green"
                       ? "ring-green-500"
                       : "ring-transparent"
@@ -241,7 +241,7 @@ function Projects() {
                 <button
                   type="button"
                   onClick={() => setNewProjectColor("red")}
-                  className={`h-8 w-8 rounded-full bg-red-500 ring-2 ring-offset-2 ${
+                  className={`h-9 w-9 rounded-full bg-red-500 ring-2 ring-offset-2 transition ${
                     newProjectColor === "red"
                       ? "ring-red-500"
                       : "ring-transparent"
