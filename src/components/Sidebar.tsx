@@ -26,6 +26,7 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProps) {
           </p>
 
           <ul className="space-y-1">
+            {/* Dashboard */}
             <li>
               <NavLink
                 to="/"
@@ -55,6 +56,7 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProps) {
               </NavLink>
             </li>
 
+            {/* Projects */}
             <li>
               <NavLink
                 to="/projects"
@@ -82,6 +84,42 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProps) {
                 </svg>
 
                 Projects
+              </NavLink>
+            </li>
+
+            {/* Tasks */}
+            <li>
+              <NavLink
+                to="/tasks"
+                onClick={() => setIsSidebarOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+                    isActive
+                      ? "bg-indigo-100 text-indigo-700"
+                      : "text-slate-600 hover:bg-slate-100"
+                  }`
+                }
+              >
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 11l3 3L20 6"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"
+                  />
+                </svg>
+
+                Tasks
               </NavLink>
             </li>
           </ul>
@@ -148,3 +186,4 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProps) {
 }
 
 export default Sidebar;
+
