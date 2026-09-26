@@ -314,15 +314,15 @@ function Projects() {
                   </p>
                 </div>
 
-                <div className="text-right">
-                  <p className="text-sm font-medium text-slate-700">
-                    {project.owner}
-                  </p>
+               <div className="shrink-0 text-left sm:text-right">
+  <p className="text-sm font-medium text-slate-700">
+    {project.owner}
+  </p>
 
-                  <p className="text-sm text-slate-500">
-                    {project.due}
-                  </p>
-                </div>
+  <p className="text-xs text-slate-500">
+    Due: {project.due}
+  </p>
+</div>
               </div>
 {/* Progress */}
 <div className="mt-5">
