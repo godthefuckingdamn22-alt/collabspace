@@ -251,11 +251,11 @@ function Projects() {
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300"
+                className="w-full rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-300 sm:w-auto"
               >
                 Cancel
               </button>
@@ -263,7 +263,7 @@ function Projects() {
               <button
                 type="button"
                 onClick={handleCreateProject}
-                className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+               className="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 sm:w-auto"
               >
                 Create Project
               </button>
