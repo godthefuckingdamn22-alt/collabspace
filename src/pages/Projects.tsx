@@ -281,17 +281,17 @@ function Projects() {
       <div className="grid gap-4 md:grid-cols-2">
         {filteredProjects.map((project) => (
           <div
-            key={project.id}
-            className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-          >
+  key={project.id}
+  className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+>
 
             {/* Color Accent */}
             <div
               className={`h-2 ${colorClasses[project.color]}`}
             />
 
-            {/* Card Content */}
-            <div className="p-5">
+           {/* Card Content */}
+<div className="p-5 sm:p-6">
 
               {/* Project Header */}
               <div className="flex items-center justify-between">
