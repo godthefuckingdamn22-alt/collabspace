@@ -398,32 +398,32 @@ function Projects() {
                     </p>
                   ) : (
                     project.members.map((member) => (
-                      <div
-                        key={member.id}
-                        className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5"
-                      >
-                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700">
-                          {member.initials}
-                        </span>
+                     <div
+  key={member.id}
+  className="group flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1.5 shadow-sm transition hover:border-slate-300 hover:shadow"
+>
+  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700">
+    {member.initials}
+  </span>
 
-                        <span className="text-sm text-slate-700">
-                          {member.name}
-                        </span>
+  <span className="max-w-32 truncate text-sm font-medium text-slate-700">
+    {member.name}
+  </span>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleRemoveMember(
-                              project.id,
-                              member.id
-                            )
-                          }
-                          className="text-slate-400 hover:text-red-500"
-                          aria-label={`Remove ${member.name}`}
-                        >
-                          ×
-                        </button>
-                      </div>
+  <button
+    type="button"
+    onClick={() =>
+      handleRemoveMember(
+        project.id,
+        member.id
+      )
+    }
+    className="flex h-6 w-6 items-center justify-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-red-500"
+    aria-label={`Remove ${member.name}`}
+  >
+    ×
+  </button>
+</div>
                     ))
                   )}
                 </div>
