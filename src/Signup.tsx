@@ -11,17 +11,16 @@ function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Error States
   const [fullNameError, setFullNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+
   const [successMessage, setSuccessMessage] = useState("");
 
   const validateForm = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Reset error messages
     setFullNameError("");
     setEmailError("");
     setPasswordError("");
@@ -30,13 +29,11 @@ function Signup() {
 
     let isValid = true;
 
-    // Full Name Validation
     if (fullName.trim() === "") {
       setFullNameError("Full name is required.");
       isValid = false;
     }
 
-    // Email Validation
     if (email.trim() === "") {
       setEmailError("Email is required.");
       isValid = false;
@@ -45,7 +42,6 @@ function Signup() {
       isValid = false;
     }
 
-    // Password Validation
     if (password.trim() === "") {
       setPasswordError("Password is required.");
       isValid = false;
@@ -54,7 +50,6 @@ function Signup() {
       isValid = false;
     }
 
-    // Confirm Password Validation
     if (confirmPassword.trim() === "") {
       setConfirmPasswordError("Please confirm your password.");
       isValid = false;
@@ -63,11 +58,12 @@ function Signup() {
       isValid = false;
     }
 
-    if (!isValid) return;
+    if (!isValid) {
+      return;
+    }
 
     setIsLoading(true);
 
-    // Simulated API call
     setTimeout(() => {
       setIsLoading(false);
       setSuccessMessage("Account created successfully!");
@@ -86,9 +82,9 @@ function Signup() {
         </div>
 
         <form onSubmit={validateForm} noValidate>
-          {/* Full Name */}
           <div className="form-group">
             <label htmlFor="fullName">Full Name</label>
+
             <input
               id="fullName"
               type="text"
@@ -100,14 +96,15 @@ function Signup() {
               }}
               className={fullNameError ? "input-error" : ""}
             />
+
             {fullNameError && (
               <span className="error-message">{fullNameError}</span>
             )}
           </div>
 
-          {/* Email */}
           <div className="form-group">
             <label htmlFor="signupEmail">Email Address</label>
+
             <input
               id="signupEmail"
               type="email"
@@ -119,12 +116,15 @@ function Signup() {
               }}
               className={emailError ? "input-error" : ""}
             />
-            {emailError && <span className="error-message">{emailError}</span>}
+
+            {emailError && (
+              <span className="error-message">{emailError}</span>
+            )}
           </div>
 
-          {/* Password */}
           <div className="form-group">
             <label htmlFor="signupPassword">Password</label>
+
             <div className="password-input-wrapper">
               <input
                 id="signupPassword"
@@ -137,6 +137,7 @@ function Signup() {
                 }}
                 className={passwordError ? "input-error" : ""}
               />
+
               <button
                 type="button"
                 className="show-password-button"
@@ -145,14 +146,15 @@ function Signup() {
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>
+
             {passwordError && (
               <span className="error-message">{passwordError}</span>
             )}
           </div>
 
-          {/* Confirm Password */}
           <div className="form-group">
             <label htmlFor="confirmPassword">Confirm Password</label>
+
             <input
               id="confirmPassword"
               type={showPassword ? "text" : "password"}
@@ -164,12 +166,14 @@ function Signup() {
               }}
               className={confirmPasswordError ? "input-error" : ""}
             />
+
             {confirmPasswordError && (
-              <span className="error-message">{confirmPasswordError}</span>
+              <span className="error-message">
+                {confirmPasswordError}
+              </span>
             )}
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="login-button"
@@ -178,15 +182,14 @@ function Signup() {
             {isLoading ? "Creating Account..." : "Sign Up"}
           </button>
 
-          {/* Success Message */}
           {successMessage && (
             <div className="success-message">{successMessage}</div>
           )}
         </form>
 
-        {/* Redirect to Login */}
         <div className="signup-section">
           <span>Already have an account?</span>
+
           <button
             type="button"
             className="signup-button"

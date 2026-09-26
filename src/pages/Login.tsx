@@ -1,19 +1,18 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import Signup from "../Signup";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [loginMessage, setLoginMessage] = useState("");
-
-  if (window.location.pathname === "/signup") {
-    return <Signup />;
-  }
 
   const validateForm = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,17 +21,19 @@ function Login() {
     setPasswordError("");
     setLoginMessage("");
 
+    const trimmedEmail = email.trim();
+
     let isValid = true;
 
-    if (email.trim() === "") {
+    if (trimmedEmail === "") {
       setEmailError("Email is required.");
       isValid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       setEmailError("Please enter a valid email address.");
       isValid = false;
     }
 
-    if (password.trim() === "") {
+    if (password === "") {
       setPasswordError("Password is required.");
       isValid = false;
     } else if (password.length < 8) {
@@ -75,6 +76,7 @@ function Login() {
               onChange={(e) => {
                 setEmail(e.target.value);
                 setEmailError("");
+                setLoginMessage("");
               }}
               className={emailError ? "input-error" : ""}
             />
@@ -96,6 +98,7 @@ function Login() {
                 onChange={(e) => {
                   setPassword(e.target.value);
                   setPasswordError("");
+                  setLoginMessage("");
                 }}
                 className={passwordError ? "input-error" : ""}
               />
@@ -144,9 +147,7 @@ function Login() {
           <button
             type="button"
             className="signup-button"
-            onClick={() => {
-              window.location.href = "/signup";
-            }}
+            onClick={() => navigate("/signup")}
           >
             Sign up
           </button>
