@@ -182,7 +182,7 @@ function Projects() {
               onChange={(e) =>
                 setNewProjectName(e.target.value)
               }
-              className="w-full rounded-md border border-slate-300 px-3 py-2"
+              className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100"
             />
 
             {/* Description */}
@@ -193,7 +193,7 @@ function Projects() {
               onChange={(e) =>
                 setNewProjectDescription(e.target.value)
               }
-              className="w-full rounded-md border border-slate-300 px-3 py-2"
+             className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100"
             />
 
             {/* Card Color */}
