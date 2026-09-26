@@ -155,13 +155,13 @@ function Projects() {
       </div>
 
       {/* Search */}
-      <div className="mb-6">
+     <div className="mb-6 rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
         <input
           type="text"
           placeholder="Search projects..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full rounded-md border border-slate-300 bg-white px-4 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          className="w-full rounded-md border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100"
         />
       </div>
 
@@ -327,18 +327,18 @@ function Projects() {
 {/* Progress */}
 <div className="mt-5">
   <div className="mb-2 flex items-center justify-between">
-    <span className="text-xs font-medium text-slate-500">
+    <span className="text-sm font-medium text-slate-700">
       Progress
     </span>
 
-    <span className="text-xs font-semibold text-slate-700">
+    <span className="text-sm font-semibold text-slate-900">
       {project.progress}%
     </span>
   </div>
 
-  <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+  <div className="h-2.5 overflow-hidden rounded-full bg-slate-200">
     <div
-      className={`h-full rounded-full ${
+      className={`h-full rounded-full transition-all duration-300 ${
         colorClasses[project.color]
       }`}
       style={{
@@ -348,10 +348,16 @@ function Projects() {
   </div>
 </div>
               {/* Members */}
-              <div className="mt-5 border-t border-slate-100 pt-4">
-                <p className="mb-3 text-sm font-medium text-slate-700">
-                  Members
-                </p>
+              <div className="mt-6 border-t border-slate-100 pt-5">
+               <div className="mb-3 flex items-center justify-between">
+  <p className="text-sm font-semibold text-slate-800">
+    Members
+  </p>
+
+  <span className="text-xs text-slate-400">
+    {project.members.length}
+  </span>
+</div>
 
                 {/* Add Member */}
                 <div className="mb-3 flex gap-2">
@@ -441,3 +447,4 @@ function Projects() {
 }
 
 export default Projects;
+
