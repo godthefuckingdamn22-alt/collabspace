@@ -91,8 +91,7 @@ function Projects() {
   }, [projectList, searchTerm]);
 
   return (
-    <div className="min-h-full bg-slate-50 p-6">
-
+    <div className="min-h-full bg-slate-50 px-4 py-5 sm:p-6">
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
@@ -114,13 +113,13 @@ function Projects() {
       </div>
 
       {/* Search */}
-      <div className="mb-6">
+      <div className="mb-6 rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
         <input
           type="text"
           placeholder="Search projects..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full rounded-md border border-slate-300 bg-white px-4 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+          className="w-full rounded-md border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100"
         />
       </div>
 
@@ -132,16 +131,13 @@ function Projects() {
           </h2>
 
           <div className="space-y-4">
-
             {/* Project Name */}
             <input
               type="text"
               placeholder="Project name"
               value={newProjectName}
-              onChange={(e) =>
-                setNewProjectName(e.target.value)
-              }
-              className="w-full rounded-md border border-slate-300 px-3 py-2"
+              onChange={(e) => setNewProjectName(e.target.value)}
+              className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100"
             />
 
             {/* Description */}
@@ -149,10 +145,8 @@ function Projects() {
               type="text"
               placeholder="Description"
               value={newProjectDescription}
-              onChange={(e) =>
-                setNewProjectDescription(e.target.value)
-              }
-              className="w-full rounded-md border border-slate-300 px-3 py-2"
+              onChange={(e) => setNewProjectDescription(e.target.value)}
+              className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-100"
             />
 
             {/* Card Color */}
@@ -162,12 +156,11 @@ function Projects() {
               </p>
 
               <div className="flex gap-2">
-
                 {/* Indigo */}
                 <button
                   type="button"
                   onClick={() => setNewProjectColor("indigo")}
-                  className={`h-8 w-8 rounded-full bg-indigo-500 ring-2 ring-offset-2 ${
+                  className={`h-9 w-9 rounded-full bg-indigo-500 ring-2 ring-offset-2 transition ${
                     newProjectColor === "indigo"
                       ? "ring-indigo-500"
                       : "ring-transparent"
@@ -178,7 +171,7 @@ function Projects() {
                 <button
                   type="button"
                   onClick={() => setNewProjectColor("blue")}
-                  className={`h-8 w-8 rounded-full bg-blue-500 ring-2 ring-offset-2 ${
+                  className={`h-9 w-9 rounded-full bg-blue-500 ring-2 ring-offset-2 transition ${
                     newProjectColor === "blue"
                       ? "ring-blue-500"
                       : "ring-transparent"
@@ -189,7 +182,7 @@ function Projects() {
                 <button
                   type="button"
                   onClick={() => setNewProjectColor("green")}
-                  className={`h-8 w-8 rounded-full bg-green-500 ring-2 ring-offset-2 ${
+                  className={`h-9 w-9 rounded-full bg-green-500 ring-2 ring-offset-2 transition ${
                     newProjectColor === "green"
                       ? "ring-green-500"
                       : "ring-transparent"
@@ -200,7 +193,7 @@ function Projects() {
                 <button
                   type="button"
                   onClick={() => setNewProjectColor("red")}
-                  className={`h-8 w-8 rounded-full bg-red-500 ring-2 ring-offset-2 ${
+                  className={`h-9 w-9 rounded-full bg-red-500 ring-2 ring-offset-2 transition ${
                     newProjectColor === "red"
                       ? "ring-red-500"
                       : "ring-transparent"
@@ -210,11 +203,11 @@ function Projects() {
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-300"
+                className="w-full rounded-md bg-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-300 sm:w-auto"
               >
                 Cancel
               </button>
@@ -222,7 +215,7 @@ function Projects() {
               <button
                 type="button"
                 onClick={handleCreateProject}
-                className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+                className="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 sm:w-auto"
               >
                 Create Project
               </button>
@@ -232,9 +225,18 @@ function Projects() {
       )}
 
       {/* Project Count */}
-      <p className="mb-3 text-sm text-slate-500">
-        {filteredProjects.length} project(s)
-      </p>
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-sm font-medium text-slate-700">
+          {filteredProjects.length}{" "}
+          {filteredProjects.length === 1 ? "project" : "projects"}
+        </p>
+
+        {searchTerm && (
+          <p className="text-xs text-slate-400">
+            Searching for "{searchTerm}"
+          </p>
+        )}
+      </div>
 
       {/* Projects List */}
       <div className="grid gap-4 md:grid-cols-2">
@@ -244,22 +246,19 @@ function Projects() {
           return (
             <div
               key={project.id}
-              className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
             >
-
               {/* Color Accent */}
               <div
                 className={`h-2 ${colorClasses[project.color]}`}
               />
 
               {/* Card Content */}
-              <div className="p-5">
-
+              <div className="p-5 sm:p-6">
                 {/* Project Header */}
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-
                       <span
                         className={`h-3 w-3 rounded-full ${
                           colorClasses[project.color]
@@ -276,13 +275,13 @@ function Projects() {
                     </p>
                   </div>
 
-                  <div className="text-right">
+                  <div className="shrink-0 text-left sm:text-right">
                     <p className="text-sm font-medium text-slate-700">
                       {currentUser.name}
                     </p>
 
-                    <p className="text-sm text-slate-500">
-                      {project.due}
+                    <p className="text-xs text-slate-500">
+                      Due: {project.due}
                     </p>
                   </div>
                 </div>
@@ -290,18 +289,18 @@ function Projects() {
                 {/* Progress */}
                 <div className="mt-5">
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-500">
+                    <span className="text-sm font-medium text-slate-700">
                       Progress
                     </span>
 
-                    <span className="text-xs font-semibold text-slate-700">
+                    <span className="text-sm font-semibold text-slate-900">
                       {progress}%
                     </span>
                   </div>
 
-                  <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+                  <div className="h-2.5 overflow-hidden rounded-full bg-slate-200">
                     <div
-                      className={`h-full rounded-full ${
+                      className={`h-full rounded-full transition-all duration-300 ${
                         colorClasses[project.color]
                       }`}
                       style={{
@@ -312,10 +311,16 @@ function Projects() {
                 </div>
 
                 {/* Members */}
-                <div className="mt-5 border-t border-slate-100 pt-4">
-                  <p className="mb-3 text-sm font-medium text-slate-700">
-                    Members
-                  </p>
+                <div className="mt-6 border-t border-slate-100 pt-5">
+                  <div className="mb-3 flex items-center justify-between">
+                    <p className="text-sm font-semibold text-slate-800">
+                      Members
+                    </p>
+
+                    <span className="text-xs text-slate-400">
+                      {project.members.length}
+                    </span>
+                  </div>
 
                   {/* Add Member */}
                   <div className="mb-3 flex gap-2">
@@ -339,23 +344,11 @@ function Projects() {
 
                     <button
                       type="button"
-                      onClick={() =>
-                        handleAddMember(project.id)
-                      }
+                      onClick={() => handleAddMember(project.id)}
                       className="rounded-md bg-slate-800 px-3 py-2 text-sm text-white hover:bg-slate-700"
                     >
                       Add
                     </button>
-                    
-                      <div className="mt-5 border-t border-slate-100 pt-4">
-                        <Link
-                          to={`/projects/${project.id}`}
-                          className="block w-full rounded-md bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-indigo-700"
-                        >
-                          View Project
-                        </Link>
-                      </div>
-
                   </div>
 
                   {/* Member List */}
@@ -368,13 +361,13 @@ function Projects() {
                       project.members.map((member) => (
                         <div
                           key={member.id}
-                          className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5"
+                          className="group flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1.5 shadow-sm transition hover:border-slate-300 hover:shadow"
                         >
-                          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700">
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-700">
                             {member.initials}
                           </span>
 
-                          <span className="text-sm text-slate-700">
+                          <span className="max-w-32 truncate text-sm font-medium text-slate-700">
                             {member.name}
                           </span>
 
@@ -386,7 +379,7 @@ function Projects() {
                                 member.id
                               )
                             }
-                            className="text-slate-400 hover:text-red-500"
+                            className="flex h-6 w-6 items-center justify-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-red-500"
                             aria-label={`Remove ${member.name}`}
                           >
                             ×
@@ -395,8 +388,17 @@ function Projects() {
                       ))
                     )}
                   </div>
-                </div>
 
+                  {/* View Project */}
+                  <div className="mt-5 border-t border-slate-100 pt-4">
+                    <Link
+                      to={`/projects/${project.id}`}
+                      className="block w-full rounded-md bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-white transition hover:bg-indigo-700"
+                    >
+                      View Project
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
           );
@@ -406,9 +408,29 @@ function Projects() {
       {/* Empty State */}
       {filteredProjects.length === 0 && (
         <div className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center">
-          <p className="text-sm text-slate-500">
-            No projects found.
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-xl">
+            {searchTerm ? "🔎" : "📁"}
+          </div>
+
+          <h3 className="text-sm font-semibold text-slate-800">
+            {searchTerm ? "No matching projects" : "No projects yet"}
+          </h3>
+
+          <p className="mx-auto mt-1 max-w-sm text-sm text-slate-500">
+            {searchTerm
+              ? "Try a different search term."
+              : "Create your first project to get started."}
           </p>
+
+          {!searchTerm && (
+            <button
+              type="button"
+              onClick={() => setShowForm(true)}
+              className="mt-4 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+            >
+              + New project
+            </button>
+          )}
         </div>
       )}
     </div>
