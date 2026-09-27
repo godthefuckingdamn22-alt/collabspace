@@ -6,41 +6,81 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import {
+  currentUser,
+  useProjects,
+} from "../context/ProjectContext";
+
 interface StatCard {
   label: string;
-  value: string;
+  value: number;
   description: string;
   icon: LucideIcon;
 }
 
-const stats: StatCard[] = [
-  {
-    label: "Projects",
-    value: "12",
-    description: "3 active projects",
-    icon: FolderKanban,
-  },
-  {
-    label: "Active Tasks",
-    value: "16",
-    description: "8 due this week",
-    icon: ListChecks,
-  },
-  {
-    label: "Completed",
-    value: "8",
-    description: "3 completed this week",
-    icon: CheckCircle2,
-  },
-  {
-    label: "Team Members",
-    value: "8",
-    description: "4 teams active",
-    icon: Users,
-  },
-];
-
 function DashboardStats() {
+  const { projects } = useProjects();
+
+  // Count projects the current user can access.
+  const totalProjects = projects.filter((project) =>
+    project.members.some(
+      (member) => member.id === currentUser.id
+    )
+  ).length;
+
+  // Collect tasks from accessible projects.
+  const myProjects = projects.filter((project) =>
+    project.members.some(
+      (member) => member.id === currentUser.id
+    )
+  );
+
+  const allTasks = myProjects.flatMap(
+    (project) => project.tasks
+  );
+
+  const activeTasks = allTasks.filter(
+    (task) => task.status !== "completed"
+  ).length;
+
+  const completedTasks = allTasks.filter(
+    (task) => task.status === "completed"
+  ).length;
+
+  // Count unique members across accessible projects.
+  const uniqueMembers = new Set(
+    myProjects.flatMap((project) =>
+      project.members.map((member) => member.id)
+    )
+  );
+
+  const stats: StatCard[] = [
+    {
+      label: "Projects",
+      value: totalProjects,
+      description: "Projects you have access to",
+      icon: FolderKanban,
+    },
+    {
+      label: "Active Tasks",
+      value: activeTasks,
+      description: "Tasks not yet completed",
+      icon: ListChecks,
+    },
+    {
+      label: "Completed",
+      value: completedTasks,
+      description: "Tasks completed across projects",
+      icon: CheckCircle2,
+    },
+    {
+      label: "Team Members",
+      value: uniqueMembers.size,
+      description: "Unique members across projects",
+      icon: Users,
+    },
+  ];
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => {
