@@ -1,6 +1,8 @@
+import { apiRequest } from "../services/api";
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
 
 function Login() {
   const navigate = useNavigate();
@@ -14,44 +16,63 @@ function Login() {
   const [passwordError, setPasswordError] = useState("");
   const [loginMessage, setLoginMessage] = useState("");
 
-  const validateForm = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const { refreshUser } = useAuth();
 
-    setEmailError("");
-    setPasswordError("");
-    setLoginMessage("");
+ const validateForm = async (e: FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    const trimmedEmail = email.trim();
+  setEmailError("");
+  setPasswordError("");
+  setLoginMessage("");
 
-    let isValid = true;
+  const trimmedEmail = email.trim();
+  let isValid = true;
 
-    if (trimmedEmail === "") {
-      setEmailError("Email is required.");
-      isValid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      setEmailError("Please enter a valid email address.");
-      isValid = false;
-    }
+  if (trimmedEmail === "") {
+    setEmailError("Email is required.");
+    isValid = false;
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+    setEmailError("Please enter a valid email address.");
+    isValid = false;
+  }
 
-    if (password === "") {
-      setPasswordError("Password is required.");
-      isValid = false;
-    } else if (password.length < 8) {
-      setPasswordError("Password must be at least 8 characters.");
-      isValid = false;
-    }
+  if (password === "") {
+    setPasswordError("Password is required.");
+    isValid = false;
+  } else if (password.length < 8) {
+    setPasswordError("Password must be at least 8 characters.");
+    isValid = false;
+  }
 
-    if (!isValid) {
-      return;
-    }
+  if (!isValid) {
+    return;
+  }
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      setLoginMessage("Login information is valid!");
-    }, 1000);
-  };
+  try {
+    const data = await apiRequest("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email: trimmedEmail,
+        password,
+      }),
+    });
+
+    setLoginMessage(data.message);
+
+    await refreshUser();
+    navigate("/");
+
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Login failed.";
+
+    setLoginMessage(message);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <main className="login-page">

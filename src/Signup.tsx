@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { apiRequest } from "./services/api";
 import "./App.css";
 
 function Signup() {
@@ -18,57 +19,74 @@ function Signup() {
 
   const [successMessage, setSuccessMessage] = useState("");
 
-  const validateForm = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+const validateForm = async (e: FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    setFullNameError("");
-    setEmailError("");
-    setPasswordError("");
-    setConfirmPasswordError("");
-    setSuccessMessage("");
+  setFullNameError("");
+  setEmailError("");
+  setPasswordError("");
+  setConfirmPasswordError("");
+  setSuccessMessage("");
 
-    let isValid = true;
+  let isValid = true;
 
-    if (fullName.trim() === "") {
-      setFullNameError("Full name is required.");
-      isValid = false;
-    }
+  if (fullName.trim() === "") {
+    setFullNameError("Full name is required.");
+    isValid = false;
+  }
 
-    if (email.trim() === "") {
-      setEmailError("Email is required.");
-      isValid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setEmailError("Please enter a valid email address.");
-      isValid = false;
-    }
+  const trimmedEmail = email.trim();
 
-    if (password.trim() === "") {
-      setPasswordError("Password is required.");
-      isValid = false;
-    } else if (password.length < 8) {
-      setPasswordError("Password must be at least 8 characters.");
-      isValid = false;
-    }
+  if (trimmedEmail === "") {
+    setEmailError("Email is required.");
+    isValid = false;
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+    setEmailError("Please enter a valid email address.");
+    isValid = false;
+  }
 
-    if (confirmPassword.trim() === "") {
-      setConfirmPasswordError("Please confirm your password.");
-      isValid = false;
-    } else if (password !== confirmPassword) {
-      setConfirmPasswordError("Passwords do not match.");
-      isValid = false;
-    }
+  if (password.trim() === "") {
+    setPasswordError("Password is required.");
+    isValid = false;
+  } else if (password.length < 8) {
+    setPasswordError("Password must be at least 8 characters.");
+    isValid = false;
+  }
 
-    if (!isValid) {
-      return;
-    }
+  if (confirmPassword.trim() === "") {
+    setConfirmPasswordError("Please confirm your password.");
+    isValid = false;
+  } else if (password !== confirmPassword) {
+    setConfirmPasswordError("Passwords do not match.");
+    isValid = false;
+  }
 
-    setIsLoading(true);
+  if (!isValid) {
+    return;
+  }
 
-    setTimeout(() => {
-      setIsLoading(false);
-      setSuccessMessage("Account created successfully!");
-    }, 1000);
-  };
+  setIsLoading(true);
+
+  try {
+    const data = await apiRequest("/auth/register", {
+      method: "POST",
+      body: JSON.stringify({
+        name: fullName.trim(),
+        email: trimmedEmail,
+        password,
+      }),
+    });
+
+    setSuccessMessage(data.message);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Registration failed.";
+
+    setSuccessMessage(message);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <main className="login-page">

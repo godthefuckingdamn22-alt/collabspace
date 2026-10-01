@@ -1,9 +1,25 @@
+
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
+
 interface NavbarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (isOpen: boolean) => void;
 }
 
 function Navbar({ isSidebarOpen, setIsSidebarOpen }: NavbarProps) {
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   return (
     <header className="flex h-16 items-center border-b border-slate-200 bg-white px-4 md:px-6">
       {/* Mobile Menu Button */}
@@ -29,7 +45,9 @@ function Navbar({ isSidebarOpen, setIsSidebarOpen }: NavbarProps) {
       </button>
 
       {/* Brand */}
-      <h1 className="text-lg font-semibold text-slate-900">CollabSpace</h1>
+      <h1 className="text-lg font-semibold text-slate-900">
+        CollabSpace
+      </h1>
 
       {/* Right Side */}
       <div className="ml-auto flex items-center gap-2">
@@ -47,11 +65,7 @@ function Navbar({ isSidebarOpen, setIsSidebarOpen }: NavbarProps) {
             viewBox="0 0 24 24"
           >
             <circle cx="11" cy="11" r="7" />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m20 20-4-4"
-            />
+            <path d="m20 20-4-4" />
           </svg>
         </button>
 
@@ -73,46 +87,35 @@ function Navbar({ isSidebarOpen, setIsSidebarOpen }: NavbarProps) {
               strokeLinejoin="round"
               d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"
             />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10 21h4"
-            />
+            <path d="M10 21h4" />
           </svg>
 
-          {/* Notification Indicator */}
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-indigo-600" />
         </button>
 
         {/* Profile */}
-        <button
-          type="button"
-          className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-100"
-        >
+        <div className="flex items-center gap-2 rounded-lg px-2 py-1.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700">
-            K
+            {user?.name?.charAt(0).toUpperCase() || "U"}
           </div>
 
           <div className="hidden text-left sm:block">
             <p className="text-sm font-medium text-slate-900">
-              Kian Terrence
+              {user?.name || "User"}
             </p>
-            <p className="text-xs text-slate-500">@kian</p>
+            <p className="text-xs text-slate-500">
+              {user?.email || ""}
+            </p>
           </div>
+        </div>
 
-          <svg
-            className="hidden h-4 w-4 text-slate-500 sm:block"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m6 9 6 6 6-6"
-            />
-          </svg>
+        {/* Logout */}
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
+        >
+          Log out
         </button>
       </div>
     </header>
