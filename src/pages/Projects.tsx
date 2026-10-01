@@ -1,10 +1,18 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
 import { Link } from "react-router-dom";
+
+import type { ProjectColor } from "../context/ProjectContext";
+
 import {
-  currentUser,
-  useProjects,
-  type ProjectColor,
-} from "../context/ProjectContext";
+  addProjectMember,
+  createProject as createProjectApi,
+  getProjects,
+  removeProjectMember,
+} from "../services/projectApi";
+import { useAuth } from "../context/useAuth";
+
+
 
 const colorClasses: Record<ProjectColor, string> = {
   indigo: "bg-indigo-500",
@@ -13,16 +21,78 @@ const colorClasses: Record<ProjectColor, string> = {
   red: "bg-red-500",
 };
 
+type BackendProject = {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+  ownerId: string;
+  dueDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+  owner: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  members: {
+    id: string;
+    role: string;
+    joinedAt: string;
+    user: {
+      id: string;
+      name: string;
+      email: string;
+    };
+  }[];
+};
+
+
 function Projects() {
   const [showForm, setShowForm] = useState(false);
+  const { user } = useAuth();
 
-  const {
-    projects: projectList,
-    createProject,
-    addMember,
-    removeMember,
-    getProjectProgress,
-  } = useProjects();
+  const [backendProjects, setBackendProjects] =
+  useState<BackendProject[]>([]);
+
+useEffect(() => {
+  async function loadProjects() {
+    try {
+      const data = await getProjects();
+      setBackendProjects(data.projects);
+    } catch (error) {
+      console.error("Failed to load projects:", error);
+    }
+  }
+
+
+
+  loadProjects();
+}, []);
+
+const backendProjectList = useMemo(() => {
+  return backendProjects.map((project) => ({
+    id: project.id,
+    name: project.name,
+    description: project.description,
+    color: project.color as ProjectColor,
+    due: project.dueDate
+      ? new Date(project.dueDate).toLocaleDateString()
+      : "No due date",
+    members: project.members.map((member) => ({
+      id: member.user.id,
+      name: member.user.name,
+      initials: member.user.name
+        .split(" ")
+        .map((name) => name[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase(),
+    })),
+  }));
+}, [backendProjects]);
+
+console.log("Backend projects:", backendProjects);
 
   const [newProjectName, setNewProjectName] = useState("");
   const [newProjectDescription, setNewProjectDescription] = useState("");
@@ -35,50 +105,69 @@ function Projects() {
   const [newMember, setNewMember] = useState<Record<string, string>>({});
 
   // Create project
-  const handleCreateProject = () => {
-    if (!newProjectName.trim()) return;
+const handleCreateProject = async () => {
+  if (!newProjectName.trim()) return;
 
-    createProject(
+  try {
+    await createProjectApi(
       newProjectName,
       newProjectDescription,
       newProjectColor
     );
 
+    const data = await getProjects();
+    setBackendProjects(data.projects);
+
     setNewProjectName("");
     setNewProjectDescription("");
     setNewProjectColor("indigo");
     setShowForm(false);
-  };
-
+  } catch (error) {
+    console.error("Failed to create project:", error);
+  }
+};
   // Add member to a project
-  const handleAddMember = (projectId: string) => {
-    const memberName = newMember[projectId]?.trim();
+const handleAddMember = async (projectId: string) => {
+  const memberEmail = newMember[projectId]?.trim();
 
-    if (!memberName) return;
+  if (!memberEmail) return;
 
-    addMember(projectId, memberName);
+  try {
+    await addProjectMember(projectId, memberEmail);
+
+    const data = await getProjects();
+    setBackendProjects(data.projects);
 
     setNewMember((currentMembers) => ({
       ...currentMembers,
       [projectId]: "",
     }));
-  };
+  } catch (error) {
+    console.error("Failed to add project member:", error);
+  }
+};
 
   // Remove member from a project
-  const handleRemoveMember = (
-    projectId: string,
-    memberId: string
-  ) => {
-    removeMember(projectId, memberId);
-  };
+const handleRemoveMember = async (
+  projectId: string,
+  memberId: string
+) => {
+  try {
+    await removeProjectMember(projectId, memberId);
+
+    const data = await getProjects();
+    setBackendProjects(data.projects);
+  } catch (error) {
+    console.error("Failed to remove project member:", error);
+  }
+};
 
   // Search projects
   const filteredProjects = useMemo(() => {
-    return projectList.filter((project) => {
+    return backendProjectList.filter((project) => {
       const hasAccess = project.members.some(
-        (member) => member.id === currentUser.id
+        (member) => member.id === user?.id
       );
-
       if (!hasAccess) return false;
 
       const search = searchTerm.toLowerCase();
@@ -88,7 +177,7 @@ function Projects() {
         project.description.toLowerCase().includes(search)
       );
     });
-  }, [projectList, searchTerm]);
+  }, [backendProjectList, searchTerm, user]);
 
   return (
     <div className="min-h-full bg-slate-50 px-4 py-5 sm:p-6">
@@ -241,7 +330,7 @@ function Projects() {
       {/* Projects List */}
       <div className="grid gap-4 md:grid-cols-2">
         {filteredProjects.map((project) => {
-          const progress = getProjectProgress(project);
+          const progress = 0;
 
           return (
             <div
@@ -277,7 +366,7 @@ function Projects() {
 
                   <div className="shrink-0 text-left sm:text-right">
                     <p className="text-sm font-medium text-slate-700">
-                      {currentUser.name}
+                      {user?.name}
                     </p>
 
                     <p className="text-xs text-slate-500">
@@ -326,7 +415,7 @@ function Projects() {
                   <div className="mb-3 flex gap-2">
                     <input
                       type="text"
-                      placeholder="Enter member name..."
+                      placeholder="Member email"
                       value={newMember[project.id] || ""}
                       onChange={(e) =>
                         setNewMember((currentMembers) => ({
