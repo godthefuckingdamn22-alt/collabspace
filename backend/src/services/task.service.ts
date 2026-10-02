@@ -36,6 +36,36 @@ export async function getTaskById(taskId: string) {
     },
   });
 }
+export async function createTask(
+  projectId: string,
+  title: string,
+  description: string,
+  assigneeId: string | null,
+  dueDate: Date | null,
+  priority: string,
+  status: string
+) {
+  return prisma.task.create({
+    data: {
+      projectId,
+      title: title.trim(),
+      description: description.trim(),
+      assigneeId,
+      dueDate,
+      priority,
+      status,
+    },
+    include: {
+      assignee: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+}
 export async function updateTask(
   taskId: string,
   data: {
