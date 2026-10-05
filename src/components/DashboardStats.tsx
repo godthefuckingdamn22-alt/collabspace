@@ -6,10 +6,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import {
-  currentUser,
-  useProjects,
-} from "../context/ProjectContext";
+import { useProjects } from "../context/ProjectContext";
 
 interface StatCard {
   label: string;
@@ -19,7 +16,11 @@ interface StatCard {
 }
 
 function DashboardStats() {
-  const { projects } = useProjects();
+  const { currentUser, projects } = useProjects();
+
+if (!currentUser) {
+  return null;
+}
 
   // Count projects the current user can access.
   const totalProjects = projects.filter((project) =>

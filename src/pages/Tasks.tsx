@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
+
 import { Link } from "react-router-dom";
+
 import {
-  currentUser,
   useProjects,
   type TaskStatus,
   type TaskPriority,
@@ -26,24 +27,30 @@ const priorityStyles: Record<TaskPriority, string> = {
 };
 
 function Tasks() {
-  const { projects } = useProjects();
+  const { currentUser, projects } = useProjects();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "all" | TaskStatus
   >("all");
 
-  const myTasks = useMemo(() => {
-    return projects.flatMap((project) =>
-      project.tasks
-        .filter((task) => task.assigneeId === currentUser.id)
-        .map((task) => ({
-          ...task,
-          projectName: project.name,
-          projectId: project.id,
-        }))
-    );
-  }, [projects]);
+    const myTasks = useMemo(() => {
+      if (!currentUser) {
+        return [];
+      }
+
+      const currentUserId = currentUser.id;
+
+      return projects.flatMap((project) =>
+        project.tasks
+          .filter((task) => task.assigneeId === currentUserId)
+          .map((task) => ({
+            ...task,
+            projectId: project.id,
+            projectName: project.name,
+          }))
+      );
+    }, [projects, currentUser]);
 
   const filteredTasks = useMemo(() => {
     const search = searchTerm.toLowerCase();

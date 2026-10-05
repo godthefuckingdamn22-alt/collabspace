@@ -4,13 +4,14 @@ import {
   ListPlus,
 } from "lucide-react";
 
-import {
-  currentUser,
-  useProjects,
-} from "../context/ProjectContext";
+import { useProjects } from "../context/ProjectContext";
 
 function RecentActivity() {
-  const { projects } = useProjects();
+  const { currentUser, projects } = useProjects();
+
+    if (!currentUser) {
+      return null;
+    }
 
   const accessibleProjects = projects.filter((project) =>
     project.members.some(

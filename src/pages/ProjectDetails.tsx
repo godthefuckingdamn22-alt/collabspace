@@ -47,6 +47,7 @@ function ProjectDetails() {
 
   const {
     projects,
+    addMember,
     addTask,
     updateTask,
     updateTaskStatus,
@@ -59,7 +60,8 @@ function ProjectDetails() {
     } = useProjects();
 
 
-  const [showTaskForm, setShowTaskForm] = useState(false);
+const [showTaskForm, setShowTaskForm] = useState(false);
+const [memberEmail, setMemberEmail] = useState("");
 
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
@@ -128,6 +130,14 @@ function ProjectDetails() {
     setEditingTaskId(task.id);
     setShowTaskForm(true);
   };
+
+  const handleAddMember = () => {
+  if (!project || !memberEmail.trim()) return;
+
+  addMember(project.id, memberEmail);
+
+  setMemberEmail("");
+};
 
   if (!project) {
         return (
@@ -273,14 +283,37 @@ function ProjectDetails() {
 
       {/* Members */}
       <div className="mb-8 rounded-lg border border-slate-200 bg-white p-5">
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-slate-900">
-            Members
-          </h2>
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">
+              Members
+            </h2>
 
-          <p className="text-sm text-slate-500">
-            People working on this project.
-          </p>
+            <p className="text-sm text-slate-500">
+              People working on this project.
+            </p>
+          </div>
+
+          {isProjectOwner && (
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={memberEmail}
+                onChange={(e) => setMemberEmail(e.target.value)}
+                placeholder="member@email.com"
+                className="w-56 rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              />
+
+              <button
+                type="button"
+                onClick={handleAddMember}
+                disabled={!memberEmail.trim()}
+                className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Add Member
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="space-y-3">

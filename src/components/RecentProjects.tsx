@@ -1,22 +1,22 @@
 import { Link } from "react-router-dom";
 
-import {
-  currentUser,
-  useProjects,
-} from "../context/ProjectContext";
+import { useProjects } from "../context/ProjectContext";
 
 function RecentProjects() {
-  const { projects, getProjectProgress } = useProjects();
+  const { currentUser, projects, getProjectProgress } = useProjects();
 
-  // Show only projects the current user can access.
+  if (!currentUser) {
+    return null;
+  }
+
+ 
   const accessibleProjects = projects.filter((project) =>
     project.members.some(
       (member) => member.id === currentUser.id
     )
   );
 
-  // Show up to 3 projects, with the most recently created
-  // projects appearing first.
+
   const recentProjects = [...accessibleProjects]
     .reverse()
     .slice(0, 3);
