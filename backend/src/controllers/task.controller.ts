@@ -5,8 +5,10 @@ import {
   deleteTask,
   getProjectTasks,
   getTaskById,
+  getTaskAuthorization,
   updateTask,
 } from "../services/task.service.js";
+import { getProjectById } from "../services/project.service.js";
 
 const VALID_PRIORITIES = ["low", "medium", "high"];
 const VALID_STATUSES = ["todo", "in-progress", "completed"];
@@ -34,6 +36,15 @@ export async function getProjectTasksController(
       });
     }
 
+    const project = await getProjectById(projectId, req.userId);
+
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found.",
+      });
+    }
+
     const tasks = await getProjectTasks(projectId);
 
     return res.status(200).json({
@@ -52,7 +63,6 @@ export async function getProjectTasksController(
     });
   }
 }
-
 export async function getTaskByIdController(
   req: AuthRequest,
   res: Response
@@ -73,6 +83,28 @@ export async function getTaskByIdController(
       return res.status(400).json({
         success: false,
         message: "Task ID is required.",
+      });
+    }
+
+    const authorization = await getTaskAuthorization(taskId);
+
+    if (!authorization) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found.",
+      });
+    }
+
+    const isOwner =
+      authorization.project.ownerId === req.userId;
+
+    const isAssignee =
+      authorization.assigneeId === req.userId;
+
+    if (!isOwner && !isAssignee) {
+      return res.status(403).json({
+        success: false,
+        message: "You do not have access to this task.",
       });
     }
 
@@ -101,7 +133,6 @@ export async function getTaskByIdController(
     });
   }
 }
-
 export async function createTaskController(
   req: AuthRequest,
   res: Response
@@ -122,6 +153,22 @@ export async function createTaskController(
       return res.status(400).json({
         success: false,
         message: "Project ID is required.",
+      });
+    }
+
+    const project = await getProjectById(projectId, req.userId);
+
+    if (!project) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found.",
+      });
+    }
+
+    if (project.ownerId !== req.userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Only the project owner can create tasks.",
       });
     }
 
@@ -168,7 +215,11 @@ export async function createTaskController(
 
     let parsedDueDate: Date | null = null;
 
-    if (dueDate !== undefined && dueDate !== null && dueDate !== "") {
+    if (
+      dueDate !== undefined &&
+      dueDate !== null &&
+      dueDate !== ""
+    ) {
       parsedDueDate = new Date(dueDate);
 
       if (Number.isNaN(parsedDueDate.getTime())) {
@@ -249,6 +300,25 @@ export async function updateTaskController(
       });
     }
 
+    const authorization = await getTaskAuthorization(taskId);
+
+    if (!authorization) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found.",
+      });
+    }
+
+    const isOwner = authorization.project.ownerId === req.userId;
+    const isAssignee = authorization.assigneeId === req.userId;
+
+    if (!isOwner && !isAssignee) {
+      return res.status(403).json({
+        success: false,
+        message: "You do not have permission to update this task.",
+      });
+    }
+
     const {
       title,
       description,
@@ -257,6 +327,30 @@ export async function updateTaskController(
       priority,
       status,
     } = req.body;
+
+    // Regular members can only update the status of their own assigned task.
+    if (!isOwner) {
+      const memberOnlyFields =
+        title !== undefined ||
+        description !== undefined ||
+        assigneeId !== undefined ||
+        dueDate !== undefined ||
+        priority !== undefined;
+
+      if (memberOnlyFields) {
+        return res.status(403).json({
+          success: false,
+          message: "Members can only update the status of their assigned tasks.",
+        });
+      }
+
+      if (status === undefined) {
+        return res.status(400).json({
+          success: false,
+          message: "Task status is required.",
+        });
+      }
+    }
 
     if (
       title !== undefined &&
@@ -386,6 +480,22 @@ export async function deleteTaskController(
       return res.status(400).json({
         success: false,
         message: "Task ID is required.",
+      });
+    }
+
+    const authorization = await getTaskAuthorization(taskId);
+
+    if (!authorization) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found.",
+      });
+    }
+
+    if (authorization.project.ownerId !== req.userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Only the project owner can delete tasks.",
       });
     }
 

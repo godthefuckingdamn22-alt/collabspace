@@ -131,3 +131,18 @@ export async function deleteTask(taskId: string) {
 
   return task;
 }
+
+export async function getTaskAuthorization(taskId: string) {
+  return prisma.task.findUnique({
+    where: { id: taskId },
+    select: {
+      id: true,
+      project: {
+        select: {
+          ownerId: true,
+        },
+      },
+      assigneeId: true,
+    },
+  });
+}
