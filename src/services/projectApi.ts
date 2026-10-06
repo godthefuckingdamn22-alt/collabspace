@@ -19,6 +19,10 @@ export async function createProject(
   });
 }
 
+export async function getProjectById(projectId: string) {
+  return apiRequest(`/projects/${projectId}`);
+}
+
 export async function addProjectMember(
   projectId: string,
   email: string

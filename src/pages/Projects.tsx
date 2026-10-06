@@ -7,6 +7,7 @@ import type { ProjectColor } from "../context/ProjectContext";
 import {
   addProjectMember,
   createProject as createProjectApi,
+  getProjectById,
   getProjects,
   removeProjectMember,
 } from "../services/projectApi";
@@ -35,7 +36,7 @@ type BackendProject = {
     name: string;
     email: string;
   };
-  members: {
+    members: {
     id: string;
     role: string;
     joinedAt: string;
@@ -44,6 +45,10 @@ type BackendProject = {
       name: string;
       email: string;
     };
+  }[];
+  tasks: {
+    id: string;
+    status: string;
   }[];
 };
 
@@ -59,13 +64,23 @@ useEffect(() => {
   async function loadProjects() {
     try {
       const data = await getProjects();
-      setBackendProjects(data.projects);
+
+      const projectsWithTasks = await Promise.all(
+        data.projects.map(async (project: BackendProject) => {
+          const projectData = await getProjectById(project.id);
+
+          return {
+            ...project,
+            tasks: projectData.project.tasks,
+          };
+        })
+      );
+
+      setBackendProjects(projectsWithTasks);
     } catch (error) {
       console.error("Failed to load projects:", error);
     }
   }
-
-
 
   loadProjects();
 }, []);
@@ -89,6 +104,7 @@ const backendProjectList = useMemo(() => {
         .slice(0, 2)
         .toUpperCase(),
     })),
+    tasks: project.tasks,
   }));
 }, [backendProjects]);
 
@@ -330,9 +346,17 @@ const handleRemoveMember = async (
       {/* Projects List */}
       <div className="grid gap-4 md:grid-cols-2">
         {filteredProjects.map((project) => {
-          const progress = 0;
+          const completedTasks = project.tasks.filter(
+            (task) => task.status === "completed"
+          ).length;
+
+          const progress =
+            project.tasks.length > 0
+              ? Math.round((completedTasks / project.tasks.length) * 100)
+              : 0;
 
           return (
+    // existing project card
             <div
               key={project.id}
               className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
