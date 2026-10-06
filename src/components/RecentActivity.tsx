@@ -4,18 +4,17 @@ import {
   ListPlus,
 } from "lucide-react";
 
-import {
-  currentUser,
-  useProjects,
-} from "../context/ProjectContext";
+import { useProjects } from "../context/ProjectContext";
+import { useAuth } from "../context/useAuth";
 
 function RecentActivity() {
   const { projects } = useProjects();
+  const { user } = useAuth();
 
-  const accessibleProjects = projects.filter((project) =>
-    project.members.some(
-      (member) => member.id === currentUser.id
-    )
+  const accessibleProjects = projects.filter(
+    (project) =>
+      project.ownerId === user?.id ||
+      project.members.some((member) => member.id === user?.id)
   );
 
   const activities = accessibleProjects
@@ -58,11 +57,12 @@ function RecentActivity() {
             ? Clock3
             : ListPlus;
 
-        const action = isCompleted
-          ? "completed"
-          : isInProgress
-            ? "started working on"
-            : "created";
+        const statusLabel =
+          task.status === "todo"
+            ? "To Do"
+            : task.status === "in-progress"
+              ? "In Progress"
+              : "Completed";
 
         return (
           <div
@@ -79,10 +79,7 @@ function RecentActivity() {
 
             <div className="min-w-0 flex-1">
               <p className="text-sm text-slate-700">
-                <span className="font-semibold text-slate-900">
-                  {currentUser.name}
-                </span>{" "}
-                {action}{" "}
+                Task{" "}
                 <span className="font-medium text-slate-900">
                   {task.title}
                 </span>{" "}
@@ -93,12 +90,7 @@ function RecentActivity() {
               </p>
 
               <p className="mt-1 text-xs text-slate-400">
-                Current status:{" "}
-                {task.status === "todo"
-                  ? "To Do"
-                  : task.status === "in-progress"
-                    ? "In Progress"
-                    : "Completed"}
+                Current status: {statusLabel}
               </p>
             </div>
           </div>
@@ -109,4 +101,3 @@ function RecentActivity() {
 }
 
 export default RecentActivity;
-

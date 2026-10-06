@@ -1,18 +1,18 @@
 import { Link } from "react-router-dom";
 
-import {
-  currentUser,
-  useProjects,
-} from "../context/ProjectContext";
+import { useProjects } from "../context/ProjectContext";
+import { useAuth } from "../context/useAuth";
 
 function RecentProjects() {
   const { projects, getProjectProgress } = useProjects();
+  const { user } = useAuth();
 
-  // Show only projects the current user can access.
-  const accessibleProjects = projects.filter((project) =>
-    project.members.some(
-      (member) => member.id === currentUser.id
-    )
+  // A user can access a project if they are the owner
+  // or a member of that project.
+  const accessibleProjects = projects.filter(
+    (project) =>
+      project.ownerId === user?.id ||
+      project.members.some((member) => member.id === user?.id)
   );
 
   // Show up to 3 projects, with the most recently created
@@ -46,11 +46,13 @@ function RecentProjects() {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {recentProjects.map((project) => {
         const progress = getProjectProgress(project);
+
         const completedTasks = project.tasks.filter(
           (task) => task.status === "completed"
         ).length;
 
         const totalTasks = project.tasks.length;
+
         const isCompleted =
           totalTasks > 0 && completedTasks === totalTasks;
 

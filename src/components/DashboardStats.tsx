@@ -6,10 +6,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import {
-  currentUser,
-  useProjects,
-} from "../context/ProjectContext";
+import { useProjects } from "../context/ProjectContext";
+import { useAuth } from "../context/useAuth";
 
 interface StatCard {
   label: string;
@@ -20,22 +18,15 @@ interface StatCard {
 
 function DashboardStats() {
   const { projects } = useProjects();
+  const { user } = useAuth();
 
-  // Count projects the current user can access.
-  const totalProjects = projects.filter((project) =>
-    project.members.some(
-      (member) => member.id === currentUser.id
-    )
-  ).length;
-
-  // Collect tasks from accessible projects.
-  const myProjects = projects.filter((project) =>
-    project.members.some(
-      (member) => member.id === currentUser.id
-    )
+  const accessibleProjects = projects.filter(
+    (project) =>
+      project.ownerId === user?.id ||
+      project.members.some((member) => member.id === user?.id)
   );
 
-  const allTasks = myProjects.flatMap(
+  const allTasks = accessibleProjects.flatMap(
     (project) => project.tasks
   );
 
@@ -47,17 +38,22 @@ function DashboardStats() {
     (task) => task.status === "completed"
   ).length;
 
-  // Count unique members across accessible projects.
   const uniqueMembers = new Set(
-    myProjects.flatMap((project) =>
+    accessibleProjects.flatMap((project) =>
       project.members.map((member) => member.id)
     )
   );
 
+  // Include project owners as team members when they are not
+  // already included in the project's member list.
+  accessibleProjects.forEach((project) => {
+    uniqueMembers.add(project.ownerId);
+  });
+
   const stats: StatCard[] = [
     {
       label: "Projects",
-      value: totalProjects,
+      value: accessibleProjects.length,
       description: "Projects you have access to",
       icon: FolderKanban,
     },
