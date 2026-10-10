@@ -94,6 +94,16 @@ export async function removeProjectMember(
     throw new Error("Project member not found.");
   }
 
+  await prisma.task.updateMany({
+    where: {
+      projectId,
+      assigneeId: userId,
+    },
+    data: {
+      assigneeId: null,
+    },
+  });
+
   return prisma.projectMember.delete({
     where: {
       projectId_userId: {

@@ -5,16 +5,19 @@ import {
 } from "lucide-react";
 
 import { useProjects } from "../context/ProjectContext";
-import { useAuth } from "../context/useAuth";
 
 function RecentActivity() {
-  const { projects } = useProjects();
-  const { user } = useAuth();
+  const { currentUser, projects } = useProjects();
 
+  if (!currentUser) {
+    return null;
+  }
+
+  // Projects the current user owns or is a member of.
   const accessibleProjects = projects.filter(
     (project) =>
-      project.ownerId === user?.id ||
-      project.members.some((member) => member.id === user?.id)
+      project.ownerId === currentUser.id ||
+      project.members.some((member) => member.id === currentUser.id)
   );
 
   const activities = accessibleProjects
@@ -57,6 +60,12 @@ function RecentActivity() {
             ? Clock3
             : ListPlus;
 
+        const action = isCompleted
+          ? "completed"
+          : isInProgress
+            ? "started working on"
+            : "created";
+
         const statusLabel =
           task.status === "todo"
             ? "To Do"
@@ -79,7 +88,10 @@ function RecentActivity() {
 
             <div className="min-w-0 flex-1">
               <p className="text-sm text-slate-700">
-                Task{" "}
+                <span className="font-semibold text-slate-900">
+                  {currentUser.name}
+                </span>{" "}
+                {action}{" "}
                 <span className="font-medium text-slate-900">
                   {task.title}
                 </span>{" "}

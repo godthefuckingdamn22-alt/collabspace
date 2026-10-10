@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 
 import { useProjects } from "../context/ProjectContext";
-import { useAuth } from "../context/useAuth";
 
 interface StatCard {
   label: string;
@@ -17,13 +16,17 @@ interface StatCard {
 }
 
 function DashboardStats() {
-  const { projects } = useProjects();
-  const { user } = useAuth();
+  const { currentUser, projects } = useProjects();
 
+  if (!currentUser) {
+    return null;
+  }
+
+  // Projects the current user owns or is a member of.
   const accessibleProjects = projects.filter(
     (project) =>
-      project.ownerId === user?.id ||
-      project.members.some((member) => member.id === user?.id)
+      project.ownerId === currentUser.id ||
+      project.members.some((member) => member.id === currentUser.id)
   );
 
   const allTasks = accessibleProjects.flatMap(
