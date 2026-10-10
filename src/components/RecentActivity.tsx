@@ -9,14 +9,15 @@ import { useProjects } from "../context/ProjectContext";
 function RecentActivity() {
   const { currentUser, projects } = useProjects();
 
-    if (!currentUser) {
-      return null;
-    }
+  if (!currentUser) {
+    return null;
+  }
 
-  const accessibleProjects = projects.filter((project) =>
-    project.members.some(
-      (member) => member.id === currentUser.id
-    )
+  // Projects the current user owns or is a member of.
+  const accessibleProjects = projects.filter(
+    (project) =>
+      project.ownerId === currentUser.id ||
+      project.members.some((member) => member.id === currentUser.id)
   );
 
   const activities = accessibleProjects
@@ -65,6 +66,13 @@ function RecentActivity() {
             ? "started working on"
             : "created";
 
+        const statusLabel =
+          task.status === "todo"
+            ? "To Do"
+            : task.status === "in-progress"
+              ? "In Progress"
+              : "Completed";
+
         return (
           <div
             key={activity.id}
@@ -94,12 +102,7 @@ function RecentActivity() {
               </p>
 
               <p className="mt-1 text-xs text-slate-400">
-                Current status:{" "}
-                {task.status === "todo"
-                  ? "To Do"
-                  : task.status === "in-progress"
-                    ? "In Progress"
-                    : "Completed"}
+                Current status: {statusLabel}
               </p>
             </div>
           </div>
@@ -110,4 +113,3 @@ function RecentActivity() {
 }
 
 export default RecentActivity;
-

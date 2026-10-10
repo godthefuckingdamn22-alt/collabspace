@@ -9,13 +9,13 @@ function RecentProjects() {
     return null;
   }
 
- 
-  const accessibleProjects = projects.filter((project) =>
-    project.members.some(
-      (member) => member.id === currentUser.id
-    )
+  // A user can access a project if they are the owner
+  // or a member of that project.
+  const accessibleProjects = projects.filter(
+    (project) =>
+      project.ownerId === currentUser.id ||
+      project.members.some((member) => member.id === currentUser.id)
   );
-
 
   const recentProjects = [...accessibleProjects]
     .reverse()
@@ -46,11 +46,13 @@ function RecentProjects() {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {recentProjects.map((project) => {
         const progress = getProjectProgress(project);
+
         const completedTasks = project.tasks.filter(
           (task) => task.status === "completed"
         ).length;
 
         const totalTasks = project.tasks.length;
+
         const isCompleted =
           totalTasks > 0 && completedTasks === totalTasks;
 
@@ -61,7 +63,7 @@ function RecentProjects() {
           >
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <h3 className="break-words font-semibold text-slate-900">
+                <h3 className="wrap-break-word font-semibold text-slate-900">
                   {project.name}
                 </h3>
 

@@ -18,25 +18,18 @@ interface StatCard {
 function DashboardStats() {
   const { currentUser, projects } = useProjects();
 
-if (!currentUser) {
-  return null;
-}
+  if (!currentUser) {
+    return null;
+  }
 
-  // Count projects the current user can access.
-  const totalProjects = projects.filter((project) =>
-    project.members.some(
-      (member) => member.id === currentUser.id
-    )
-  ).length;
-
-  // Collect tasks from accessible projects.
-  const myProjects = projects.filter((project) =>
-    project.members.some(
-      (member) => member.id === currentUser.id
-    )
+  // Projects the current user owns or is a member of.
+  const accessibleProjects = projects.filter(
+    (project) =>
+      project.ownerId === currentUser.id ||
+      project.members.some((member) => member.id === currentUser.id)
   );
 
-  const allTasks = myProjects.flatMap(
+  const allTasks = accessibleProjects.flatMap(
     (project) => project.tasks
   );
 
@@ -48,17 +41,22 @@ if (!currentUser) {
     (task) => task.status === "completed"
   ).length;
 
-  // Count unique members across accessible projects.
   const uniqueMembers = new Set(
-    myProjects.flatMap((project) =>
+    accessibleProjects.flatMap((project) =>
       project.members.map((member) => member.id)
     )
   );
 
+  // Include project owners as team members when they are not
+  // already included in the project's member list.
+  accessibleProjects.forEach((project) => {
+    uniqueMembers.add(project.ownerId);
+  });
+
   const stats: StatCard[] = [
     {
       label: "Projects",
-      value: totalProjects,
+      value: accessibleProjects.length,
       description: "Projects you have access to",
       icon: FolderKanban,
     },

@@ -1,9 +1,13 @@
 import { Link } from "react-router-dom";
+
 import DashboardStats from "../components/DashboardStats";
 import RecentProjects from "../components/RecentProjects";
 import RecentActivity from "../components/RecentActivity";
+import { useAuth } from "../context/useAuth";
 
 function Dashboard() {
+  const { user } = useAuth();
+
   return (
     <div className="mx-auto max-w-7xl p-6 lg:p-8">
       {/* Header */}
@@ -13,7 +17,7 @@ function Dashboard() {
         </p>
 
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-          Welcome back, Kian 👋
+          Welcome back, {user?.name ?? "there"} 👋
         </h1>
 
         <p className="mt-3 max-w-2xl text-slate-500">
@@ -43,20 +47,19 @@ function Dashboard() {
             </p>
           </div>
 
-            <Link
-              to="/projects"
-              className="text-sm font-medium text-indigo-600 transition hover:text-indigo-700"
-            >
-              View all
-            </Link>
-            
+          <Link
+            to="/projects"
+            className="text-sm font-medium text-indigo-600 transition hover:text-indigo-700"
+          >
+            View all
+          </Link>
         </div>
 
         <RecentProjects />
       </section>
 
       {/* Recent Activity */}
-     <section className="mt-8">
+      <section className="mt-8">
         <div className="mb-4">
           <h2 className="text-lg font-semibold text-slate-900">
             Recent Activity
